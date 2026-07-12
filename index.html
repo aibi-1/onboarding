@@ -180,6 +180,7 @@
         </button>
       </div>
       <div class="flex items-center gap-3 px-1">
+        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">👩‍💼</div>
         <div>
           <p class="text-white font-bold text-sm">Дениза</p>
           <p class="text-white/60 text-xs">Менеджер</p>
@@ -204,6 +205,7 @@
         </button>
       </div>
       <div class="flex items-center gap-3 px-1">
+        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">🧑‍💻</div>
         <div>
           <p class="text-white font-bold text-sm">Артур</p>
           <p class="text-white/60 text-xs">Ментор</p>
@@ -220,6 +222,7 @@
     <!-- Modal header -->
     <div class="shimmer-card px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
+        <div id="modal-avatar" class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">👩‍💼</div>
         <div>
           <p id="modal-name" class="text-white font-bold text-sm">Дениза</p>
           <p id="modal-role" class="text-white/60 text-xs">Менеджер</p>
@@ -236,37 +239,30 @@
     <div class="px-6 pb-6">
       <div class="rounded-2xl overflow-hidden bg-gray-100 relative" style="aspect-ratio:16/9; box-shadow:0 4px 24px rgba(27,63,228,0.15);">
         <!-- Декоративная рамка -->
-        <div class="absolute inset-0 rounded-2xl" style="box-shadow:inset 0 0 0 3px rgba(27,63,228,0.15); pointer-events:none; z-index:1;"></div>
+        <div class="absolute inset-0 rounded-2xl" style="box-shadow:inset 0 0 0 3px rgba(27,63,228,0.12); pointer-events:none; z-index:2;"></div>
+
         <!--
-          ВСТАВЬТЕ ССЫЛКУ НА ВИДЕО В АТРИБУТ data-src ниже.
-          Для YouTube: https://www.youtube.com/embed/ВИДЕО_ID
-          Для Google Drive: https://drive.google.com/file/d/FILE_ID/preview
+          КАК ВСТАВИТЬ ВИДЕО:
+          1. Положите файлы deniza.mp4 и artur.mp4 в ту же папку что и index.html
+          2. В теге <source> замените src="" на src="deniza.mp4" (или artur.mp4)
+          Пример: <source src="deniza.mp4" type="video/mp4">
         -->
-        <iframe
-          id="manager-video"
-          data-src="video/artur.MP4"
-          src=""
-          title="Видео менеджера"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="w-full h-full absolute inset-0"
-        ></iframe>
-        <iframe
-          id="mentor-video"
-          data-src=""
-          src=""
-          title="Видео ментора"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="w-full h-full absolute inset-0"
-          style="display:none;"
-        ></iframe>
-        <!-- Плейсхолдер когда src пустой -->
-        <div id="video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-50">
+
+        <!-- Видео менеджера -->
+        <video id="manager-video" class="w-full h-full absolute inset-0 object-cover" controls preload="none" style="display:none;">
+          <source src="deniza.mp4" type="video/mp4">
+        </video>
+
+        <!-- Видео ментора -->
+        <video id="mentor-video" class="w-full h-full absolute inset-0 object-cover" controls preload="none" style="display:none;">
+          <source src="artur.MP4" type="video/mp4">
+        </video>
+
+        <!-- Плейсхолдер -->
+        <div id="video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-50 z-10">
           <div class="w-16 h-16 rounded-full shimmer-card flex items-center justify-center text-white text-2xl">▶</div>
-          <p class="text-gray-400 text-sm font-medium">Видео скоро появится</p>
+          <p class="text-gray-400 text-sm font-medium">Видео появится здесь</p>
+          <p class="text-gray-300 text-xs">Добавьте файл .mp4 рядом с index.html</p>
         </div>
       </div>
     </div>
@@ -502,31 +498,32 @@ function openVideo(role) {
   const title = document.getElementById('modal-title');
   const avatar = document.getElementById('modal-avatar');
 
-  // Reset both
   mgrVideo.style.display = 'none';
   mntVideo.style.display = 'none';
+  mgrVideo.pause();
+  mntVideo.pause();
 
+  let activeVideo;
   if (role === 'manager') {
     name.textContent = 'Дениза';
     roleEl.textContent = 'Менеджер';
     title.textContent = 'Менеджер отвечает на популярные вопросы';
     avatar.textContent = '👩‍💼';
-    mgrVideo.style.display = 'block';
-    // Загружаем src только при открытии
-    if (mgrVideo.dataset.src && !mgrVideo.src.includes(mgrVideo.dataset.src)) {
-      mgrVideo.src = mgrVideo.dataset.src;
-    }
-    placeholder.style.display = mgrVideo.dataset.src ? 'none' : 'flex';
+    activeVideo = mgrVideo;
   } else {
     name.textContent = 'Артур';
     roleEl.textContent = 'Ментор';
     title.textContent = 'Ментор отвечает на популярные вопросы';
     avatar.textContent = '🧑‍💻';
-    mntVideo.style.display = 'block';
-    if (mntVideo.dataset.src && !mntVideo.src.includes(mntVideo.dataset.src)) {
-      mntVideo.src = mntVideo.dataset.src;
-    }
-    placeholder.style.display = mntVideo.dataset.src ? 'none' : 'flex';
+    activeVideo = mntVideo;
+  }
+
+  const hasSrc = activeVideo.querySelector('source').getAttribute('src');
+  if (hasSrc) {
+    activeVideo.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    placeholder.style.display = 'flex';
   }
 
   modal.style.setProperty('display', 'flex', 'important');
@@ -535,27 +532,20 @@ function openVideo(role) {
 
 function closeVideo() {
   const modal = document.getElementById('video-modal');
-  // Останавливаем оба видео убирая src
-  const mgrVideo = document.getElementById('manager-video');
-  const mntVideo = document.getElementById('mentor-video');
-  const mgrSrc = mgrVideo.src;
-  const mntSrc = mntVideo.src;
-  mgrVideo.src = '';
-  mntVideo.src = '';
-  // Восстанавливаем data-src чтобы можно было открыть снова
-  if (mgrSrc) mgrVideo.dataset.src = mgrSrc;
-  if (mntSrc) mntVideo.dataset.src = mntSrc;
-
+  // Ставим оба видео на паузу и сбрасываем
+  ['manager-video', 'mentor-video'].forEach(id => {
+    const v = document.getElementById(id);
+    v.pause();
+    v.currentTime = 0;
+  });
   modal.style.setProperty('display', 'none', 'important');
   document.body.style.overflow = '';
 }
 
-// Закрытие по клику на фон
 document.getElementById('video-modal').addEventListener('click', function(e) {
   if (e.target === this) closeVideo();
 });
 
-// Закрытие по Escape
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeVideo();
 });
